@@ -1,0 +1,2011 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>MiFab — 3D модели MiSide</title>
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Google Model-Viewer -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+  <!-- GLTFLoader для корректного скачивания -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent !important;
+      outline: none !important;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    *:focus, *:active, *:hover {
+      outline: none !important;
+      -webkit-tap-highlight-color: transparent !important;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      max-width: 100vw;
+      overflow-x: hidden;
+      background: #f7f5f6;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #2a2b30;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      background: #fcfafb;
+      min-height: 100vh;
+      padding: 0 16px 0;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 6px 16px 4px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      flex-shrink: 0;
+      min-height: 84px;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+      padding: 4px 0;
+      background: none;
+      border: none;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+    .hamburger:hover { opacity: 0.6; }
+    .hamburger span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: #2a2b30;
+      border-radius: 2px;
+      transition: 0.2s;
+    }
+    .logo-img {
+      height: 56px !important;
+      width: auto !important;
+      max-width: 200px !important;
+      display: inline-block !important;
+      vertical-align: middle !important;
+      object-fit: contain !important;
+      flex-shrink: 0;
+    }
+    .header-center {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 0 6px;
+      min-width: 0;
+    }
+    .search-box {
+      background: #f0eef0;
+      border-radius: 40px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 120px;
+      justify-content: center;
+      transition: 0.2s;
+      border: 1px solid transparent;
+      flex-shrink: 1;
+    }
+    .search-box i { color: #9a9aa8; font-size: 0.9rem; pointer-events: none; }
+    .search-box input {
+      background: transparent;
+      border: none;
+      outline: none !important;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      color: #2a2b30;
+      width: 80px;
+      display: block;
+    }
+    .search-box input::placeholder { color: #8e8e9c; }
+    .search-box:focus-within {
+      border-color: #2a2b30;
+      background: #ffffff;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: #2a2b30;
+      font-size: 1.1rem;
+      width: 34px;
+      height: 34px;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.15s;
+      cursor: pointer;
+    }
+    .icon-btn:hover { background: rgba(0,0,0,0.04); }
+    .icon-btn:active { background: rgba(0,0,0,0.08); }
+    .bell-wrapper { position: relative; cursor: pointer; }
+    .bell-dot {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 6px;
+      height: 6px;
+      background: #f0a8b9;
+      border-radius: 50%;
+      border: 1px solid #fcfafb;
+    }
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #e5e2e5;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%238a8a96"><circle cx="12" cy="8" r="3.5" /><path d="M12 13c-3.5 0-5 1.5-5 3v1.5h10V16c0-1.5-1.5-3-5-3z"/></svg>');
+      background-size: 55%;
+      background-position: center 60%;
+      background-repeat: no-repeat;
+      border: 1px solid #2a2b30;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      flex-shrink: 0;
+    }
+    .avatar:hover { opacity: 0.7; }
+    .avatar:active { opacity: 0.5; }
+
+    /* ===== FILTER BAR ===== */
+    .filter-bar {
+      display: flex;
+      gap: 6px;
+      padding: 14px 0 10px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      flex-shrink: 0;
+      overflow-x: auto;
+      overflow-y: visible;
+      white-space: nowrap;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      position: relative;
+      flex-wrap: nowrap;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+
+    .filter-wrapper {
+      flex: 0 0 auto;
+      position: relative;
+      display: inline-flex;
+      flex-direction: column;
+      overflow: visible;
+    }
+
+    .filter-btn {
+      background: #ededed;
+      border: 1px solid #d0d0d4;
+      border-radius: 20px !important;
+      padding: 8px 14px;
+      font-weight: 600;
+      font-size: 0.65rem;
+      color: #2a2b30;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: 0.2s ease;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+      width: 100%;
+      min-width: 100px;
+    }
+    .filter-btn i { color: #7a7a88; font-size: 0.7rem; transition: 0.2s; }
+    .filter-btn:hover { background: #e0dde0; }
+    .filter-btn:active { transform: scale(0.96); }
+    .filter-btn.active {
+      background: #2a2b30 !important;
+      color: #ffffff !important;
+      border-color: #2a2b30 !important;
+    }
+    .filter-btn.active i { color: #ffffff !important; }
+
+    /* ===== ДРОПДАУНЫ — POSITION: FIXED ===== */
+    .dropdown-content {
+      position: fixed !important;
+      background: #ffffff !important;
+      border: 1px solid #000000 !important;
+      border-radius: 8px !important;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.15) !important;
+      z-index: 999999999 !important;
+      display: none;
+      width: 160px;
+      padding: 6px 0;
+      pointer-events: auto;
+    }
+    .dropdown-content.show {
+      display: block !important;
+    }
+    .dropdown-content li {
+      list-style: none;
+      padding: 8px 18px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #2a2b30;
+      cursor: pointer;
+      transition: background 0.1s;
+      font-family: 'Inter', sans-serif;
+      border-bottom: 1px solid #f0f0f2;
+      white-space: nowrap;
+      pointer-events: auto;
+    }
+    .dropdown-content li:last-child { border-bottom: none; }
+    .dropdown-content li:hover { background: #f5f3f5; }
+    .dropdown-content li:active { background: #eceaed; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.1);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: 99999998;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      width: 70%;
+      max-width: 300px;
+      height: 100%;
+      background: #ffffff;
+      border-right: 1px solid #000000;
+      border-radius: 0 12px 12px 0 !important;
+      z-index: 100000000;
+      padding: 24px 20px;
+      transition: left 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+      overflow-y: auto;
+      font-family: 'Inter', sans-serif;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.04);
+    }
+    .sidebar.active { left: 0; }
+    .sidebar h3 {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #2a2b30;
+      margin-bottom: 20px;
+      letter-spacing: -0.2px;
+    }
+    .sidebar ul { list-style: none; }
+    .sidebar ul li {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+      font-weight: 500;
+      color: #2a2b30;
+      cursor: pointer;
+      transition: color 0.15s;
+      font-size: 0.9rem;
+    }
+    .sidebar ul li:hover { color: #f0a8b9; }
+    .sidebar ul li:active { opacity: 0.6; }
+    .sidebar .close-sidebar {
+      margin-top: 30px;
+      background: none;
+      border: none;
+      color: #7a7a88;
+      font-size: 0.85rem;
+      cursor: pointer;
+      padding: 8px 0;
+      width: 100%;
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+    }
+    .sidebar .close-sidebar:hover { color: #2a2b30; }
+
+    /* ===== СТАТИСТИКА ===== */
+    .community-stats {
+      background: #f0eef0;
+      border: 1px solid #d0d0d4;
+      padding: 6px 14px;
+      margin: 12px 0 8px 0;
+      font-size: 0.6rem;
+      font-weight: 500;
+      color: #4a4b52;
+      letter-spacing: 0.2px;
+      font-family: 'Inter', sans-serif;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-radius: 8px;
+      position: relative;
+      z-index: 1;
+    }
+    .community-stats i { margin-right: 6px; color: #7a7a88; }
+
+    /* ===== ГЛАВНАЯ СТРАНИЦА ===== */
+    .page-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      padding: 10px 0 4px;
+      letter-spacing: -0.4px;
+      color: #2a2b30;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-family: 'Inter', sans-serif;
+      flex-shrink: 0;
+    }
+    .page-title small {
+      font-weight: 400;
+      font-size: 0.85rem;
+      color: #9a9aa8;
+      letter-spacing: 0.1px;
+    }
+    .tags-bar {
+      display: flex;
+      gap: 8px;
+      padding: 8px 0 12px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      flex-shrink: 0;
+    }
+    .tags-bar::-webkit-scrollbar { display: none; }
+    .tag-item {
+      flex: 0 0 auto;
+      background: #f0eef0;
+      border: 1px solid #d0d0d4;
+      border-radius: 40px;
+      padding: 4px 14px;
+      font-size: 0.6rem;
+      font-weight: 500;
+      color: #4a4b52;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: 0.15s;
+      letter-spacing: 0.2px;
+    }
+    .tag-item:hover { background: #e5e3e5; }
+    .tag-item:active { background: #d5d2d6; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 4px 0 16px;
+      flex: 1;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #000000;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      overflow: hidden;
+      transition: 0.1s;
+      width: 100%;
+      cursor: pointer;
+    }
+    .card.hidden { display: none !important; }
+    .card:active { transform: scale(0.98); }
+    .card-preview {
+      position: relative;
+      background: #0d0e12;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0 !important;
+      overflow: hidden;
+    }
+    .card-preview model-viewer {
+      width: 100%;
+      height: 100%;
+      background-color: #0d0e12;
+      --poster-color: #0d0e12;
+      pointer-events: none !important;
+    }
+    .card-preview model-viewer::part(default-progress-bar) {
+      display: none;
+    }
+    .card-preview .preview-overlay {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      padding: 3px 10px;
+      font-size: 0.5rem;
+      font-weight: 600;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+      border-radius: 4px;
+      font-family: 'Inter', sans-serif;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .card-preview .preview-overlay i { margin-right: 4px; font-size: 0.45rem; }
+    .card-footer {
+      padding: 10px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #ffffff;
+    }
+    .card-footer-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .avatar-small {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #eceaf0;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%238a8a96"><circle cx="12" cy="8" r="3.5" /><path d="M12 13c-3.5 0-5 1.5-5 3v1.5h10V16c0-1.5-1.5-3-5-3z"/></svg>');
+      background-size: 55%;
+      background-position: center 55%;
+      background-repeat: no-repeat;
+      flex-shrink: 0;
+      border: 1px solid #d0d0d4;
+    }
+    .card-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+    }
+    .card-info .model-name {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #2a2b30;
+      letter-spacing: -0.2px;
+      line-height: 1.2;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-info .author-name {
+      font-size: 0.65rem;
+      color: #8a8a98;
+      font-weight: 500;
+      margin-top: 1px;
+      letter-spacing: 0.1px;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-info .author-name i { color: #c0bcc4; margin-right: 3px; font-size: 0.55rem; }
+    .card-stats-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 4px;
+      border-top: 1px solid #f0f0f2;
+      margin-top: 2px;
+    }
+    .card-footer .by-mifab {
+      font-size: 0.5rem;
+      color: #b0b0bc;
+      font-weight: 400;
+      letter-spacing: 0.3px;
+      font-family: 'Inter', sans-serif;
+      text-transform: uppercase;
+    }
+    .stats-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.55rem;
+      font-weight: 500;
+      color: #8a8a98;
+      font-family: 'Inter', sans-serif;
+    }
+    .stats-group .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .stats-group .stat-item i {
+      font-size: 0.6rem;
+      color: #b0b0bc;
+      transition: 0.2s;
+    }
+    .stats-group .stat-item.liked i { color: #f0a8b9 !important; }
+    .stats-group .stat-item.like-btn {
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .stats-group .stat-item.like-btn:hover i {
+      color: #f0a8b9;
+      transform: scale(1.1);
+    }
+    .stats-group .stat-item.like-btn:active { transform: scale(0.9); }
+
+    /* ===== СТРАНИЦА МОДЕЛИ ===== */
+    .model-page {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 20px;
+      flex: 1;
+    }
+    .model-page.active { display: flex; }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: none;
+      border: 1px solid #000000;
+      padding: 8px 16px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #2a2b30;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: 0.15s;
+      width: fit-content;
+      margin-top: 8px;
+    }
+    .back-btn:hover { background: #f0eef0; }
+    .back-btn:active { transform: scale(0.96); }
+
+    model-viewer {
+      width: 100%;
+      height: 350px;
+      background-color: #000000;
+      border: 1px solid #000000;
+      display: block;
+      --poster-color: #000000;
+    }
+
+    .model-info-block {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 4px 0;
+    }
+    .model-info-block .model-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #2a2b30;
+      font-family: 'Inter', sans-serif;
+    }
+    .model-info-block .model-sub {
+      font-size: 0.75rem;
+      color: #8a8a98;
+      font-weight: 500;
+      font-family: 'Inter', sans-serif;
+    }
+    .model-author-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 0 4px;
+    }
+    .model-author-row .author-avatar-lg {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #eceaf0;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%238a8a96"><circle cx="12" cy="8" r="3.5" /><path d="M12 13c-3.5 0-5 1.5-5 3v1.5h10V16c0-1.5-1.5-3-5-3z"/></svg>');
+      background-size: 55%;
+      background-position: center 55%;
+      background-repeat: no-repeat;
+      border: 1px solid #d0d0d4;
+      flex-shrink: 0;
+    }
+    .model-author-row .author-name-lg {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #2a2b30;
+      font-family: 'Inter', sans-serif;
+    }
+    .model-author-row .follow-btn {
+      background: none;
+      border: 1px solid #000000;
+      padding: 4px 16px;
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: #2a2b30;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: 0.15s;
+      letter-spacing: 0.3px;
+      margin-left: auto;
+    }
+    .model-author-row .follow-btn:hover { background: #f0eef0; }
+    .model-author-row .follow-btn:active { transform: scale(0.96); }
+    .model-author-row .follow-btn.following {
+      background: #2a2b30;
+      color: #ffffff;
+    }
+
+    .model-stats-row {
+      display: flex;
+      gap: 16px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #5a5a68;
+      font-family: 'Inter', sans-serif;
+      padding: 4px 0 8px;
+      border-bottom: 1px solid #f0f0f2;
+    }
+    .model-stats-row .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .model-stats-row .stat-item i { color: #7a7a88; font-size: 0.75rem; }
+
+    .model-actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1px solid #000000;
+      margin: 4px 0 8px;
+    }
+    .model-actions-grid .action-btn {
+      background: #ffffff;
+      border: none;
+      border-right: 1px solid #000000;
+      border-bottom: 1px solid #000000;
+      padding: 10px 6px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #2a2b30;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: 0.15s;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .model-actions-grid .action-btn:nth-child(2n) { border-right: none; }
+    .model-actions-grid .action-btn:nth-child(5),
+    .model-actions-grid .action-btn:nth-child(6) { border-bottom: none; }
+    .model-actions-grid .action-btn:hover { background: #f5f3f5; }
+    .model-actions-grid .action-btn:active { transform: scale(0.96); }
+    .model-actions-grid .action-btn i { color: #7a7a88; font-size: 0.75rem; }
+    .model-actions-grid .action-btn.added i { color: #f0a8b9; }
+
+    .model-tech {
+      display: flex;
+      gap: 16px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #5a5a68;
+      font-family: 'Inter', sans-serif;
+      padding: 4px 0;
+    }
+    .model-tech .tech-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .model-tech .tech-item i { color: #7a7a88; font-size: 0.7rem; }
+
+    .model-description {
+      font-size: 0.75rem;
+      color: #4a4b52;
+      line-height: 1.5;
+      font-family: 'Inter', sans-serif;
+      padding: 4px 0;
+    }
+    .model-license {
+      font-size: 0.7rem;
+      color: #6a6a78;
+      font-family: 'Inter', sans-serif;
+      padding: 2px 0;
+    }
+    .model-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 6px 0 8px;
+    }
+    .model-tags .tag-rect {
+      background: #f0eef0;
+      border: 1px solid #000000;
+      padding: 3px 12px;
+      font-size: 0.6rem;
+      font-weight: 500;
+      color: #4a4b52;
+      font-family: 'Inter', sans-serif;
+      border-radius: 0 !important;
+    }
+
+    .model-comments {
+      border-top: 1px solid #f0f0f2;
+      padding-top: 12px;
+      margin-top: 4px;
+    }
+    .model-comments .comments-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #2a2b30;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 8px;
+    }
+    .model-comments .comment-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #000000;
+      border-radius: 0 !important;
+      font-size: 0.75rem;
+      font-family: 'Inter', sans-serif;
+      color: #2a2b30;
+      background: #ffffff;
+      outline: none !important;
+      resize: none;
+      min-height: 48px;
+    }
+    .model-comments .comment-input::placeholder {
+      color: #b0b0bc;
+    }
+    .model-comments .comment-input:focus { border-color: #2a2b30; }
+
+    /* ===== МОДАЛЬНЫЕ ОКНА ===== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.15);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      z-index: 200000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-content {
+      background: #ffffff;
+      border: 1px solid #000000;
+      border-radius: 16px !important;
+      padding: 28px 32px 32px;
+      max-width: 340px;
+      width: 90%;
+      text-align: center;
+      transform: translateY(-10px);
+      transition: transform 0.3s ease;
+    }
+    .modal-overlay.active .modal-content { transform: translateY(0); }
+    .modal-content h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #2a2b30;
+      margin-bottom: 12px;
+      font-family: 'Inter', sans-serif;
+    }
+    .modal-content .profile-field {
+      margin: 12px 0;
+      text-align: left;
+    }
+    .modal-content .profile-field label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #5a5a68;
+      display: block;
+      margin-bottom: 4px;
+      font-family: 'Inter', sans-serif;
+    }
+    .modal-content .profile-field label i {
+      margin-right: 6px;
+      color: #7a7a88;
+    }
+    .modal-content .profile-field .value {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #2a2b30;
+      font-family: 'Inter', sans-serif;
+      padding: 6px 0;
+    }
+    .modal-content .profile-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 8px 0 12px;
+    }
+    .modal-content .profile-actions button {
+      background: #f0eef0;
+      border: 1px solid #d0d0d4;
+      border-radius: 40px;
+      padding: 6px 16px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #2a2b30;
+      cursor: pointer;
+      transition: 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+    .modal-content .profile-actions button:hover { background: #e5e3e5; }
+    .modal-content .profile-actions button:active { background: #d5d2d6; }
+    .modal-content .profile-actions button.primary {
+      background: #2a2b30;
+      color: #ffffff;
+      border-color: #2a2b30;
+    }
+    .modal-content .profile-actions button.primary:hover { opacity: 0.8; }
+    .modal-content .profile-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #d0d0d4;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-family: 'Inter', sans-serif;
+      outline: none !important;
+      transition: 0.15s;
+      margin-top: 4px;
+    }
+    .modal-content .profile-input:focus { border-color: #2a2b30; outline: none !important; }
+    .modal-content .modal-close {
+      background: #2a2b30;
+      border: none;
+      color: #ffffff;
+      padding: 10px 28px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.3px;
+      border-radius: 40px;
+      margin-top: 12px;
+    }
+    .modal-content .modal-close:hover { opacity: 0.8; }
+    .modal-content .modal-close:active { opacity: 0.5; }
+
+    .about-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 12px 0 8px;
+    }
+    .about-links a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #e8e6ea;
+      color: #2a2b30;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      background: #faf8f9;
+      font-family: 'Inter', sans-serif;
+    }
+    .about-links a i {
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
+      color: #7a7a88;
+      transition: all 0.2s;
+    }
+    .about-links a:hover {
+      background: #f5f3f5;
+      border-color: #f0a8b9;
+      transform: scale(1.02);
+    }
+    .about-links a:hover i {
+      color: #f0a8b9;
+      transform: scale(1.1);
+    }
+    .about-links a .link-arrow {
+      color: #c0bcc4;
+      font-size: 0.8rem;
+      transition: 0.2s;
+      margin-left: auto;
+    }
+    .about-links a:hover .link-arrow {
+      color: #f0a8b9;
+      transform: translateX(4px);
+    }
+
+    .footer {
+      text-align: center;
+      padding: 16px 0 14px;
+      font-size: 0.7rem;
+      color: #2a2b30;
+      letter-spacing: 0.3px;
+      border-top: 1px solid rgba(0,0,0,0.05);
+      margin-top: 4px;
+      flex-shrink: 0;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+    }
+
+    @media (min-width: 500px) { .app { max-width: 420px; padding: 0 18px 0; } }
+    @media (min-width: 768px) {
+      body { background: #f2eff1; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+      .app { max-width: 400px; min-height: 90vh; border-radius: 0; margin: 20px auto; box-shadow: 0 12px 48px rgba(0,0,0,0.02); border: 1px solid #d0d0d4; }
+    }
+    @media (max-width: 440px) {
+      .grid { gap: 8px; }
+      .card-info .model-name { font-size: 0.75rem; }
+      .filter-btn { font-size: 0.6rem; padding: 6px 10px; min-width: 80px; }
+      .search-box { min-width: 90px; padding: 6px 12px; }
+      .search-box input { font-size: 0.7rem; width: 60px; }
+      .community-stats { font-size: 0.55rem; padding: 5px 10px; }
+      .logo-img { height: 48px !important; max-width: 150px !important; }
+      .stats-group { font-size: 0.5rem; gap: 6px; }
+      .dropdown-content { width: 140px; }
+      .dropdown-content li { font-size: 0.7rem; padding: 6px 14px; }
+      .sidebar { width: 80%; }
+      .model-actions-grid .action-btn { font-size: 0.6rem; padding: 8px 4px; }
+      model-viewer { height: 250px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="sidebar" id="sidebar">
+  <h3>Меню</h3>
+  <ul>
+    <li id="menuHome"><i class="fa-solid fa-house" style="margin-right:10px;width:20px;color:#7a7a88;"></i>Главная</li>
+    <li id="menuUpload"><i class="fa-solid fa-arrow-up-from-bracket" style="margin-right:10px;width:20px;color:#7a7a88;"></i>Загрузить модель</li>
+    <li id="menuProfile"><i class="fa-solid fa-user" style="margin-right:10px;width:20px;color:#7a7a88;"></i>Мой профиль</li>
+    <li id="menuAbout"><i class="fa-solid fa-circle-info" style="margin-right:10px;width:20px;color:#7a7a88;"></i>О проекте MiFab</li>
+  </ul>
+  <button class="close-sidebar" id="closeSidebarBtn"><i class="fa-solid fa-xmark" style="margin-right:8px;"></i>Закрыть</button>
+</div>
+
+<!-- ВЫПАДАЮЩИЕ СПИСКИ (position: fixed) -->
+<div class="dropdown-content" id="dropdown-categories">
+  <li data-value="Персонажи">Персонажи</li>
+  <li data-value="Локации">Локации</li>
+  <li data-value="Предметы">Предметы</li>
+</div>
+
+<div class="dropdown-content" id="dropdown-filters">
+  <li data-value="Популярные">Популярные</li>
+  <li data-value="Новые">Новые</li>
+  <li data-value="По алфавиту">По алфавиту</li>
+</div>
+
+<div class="dropdown-content" id="dropdown-sort">
+  <li data-value="popular">Популярные</li>
+  <li data-value="new">Новые</li>
+  <li data-value="alphabet">По алфавиту</li>
+</div>
+
+<!-- МОДАЛЬНЫЕ ОКНА -->
+<div class="modal-overlay" id="profileModal">
+  <div class="modal-content">
+    <h2><i class="fa-solid fa-user-gear" style="color:#f0a8b9;margin-right:8px;"></i>Профиль</h2>
+    <div class="profile-field">
+      <label><i class="fa-solid fa-id-badge"></i>Никнейм</label>
+      <div class="value" id="profileNickname">Загрузка...</div>
+      <div class="profile-actions">
+        <button id="profileEditBtn"><i class="fa-regular fa-pen-to-square" style="margin-right:4px;"></i>Изменить ник</button>
+      </div>
+      <div id="profileEditContainer" style="display:none; margin-top:8px;">
+        <input type="text" class="profile-input" id="profileNickInput" placeholder="Введите новый ник">
+        <div class="profile-actions" style="margin-top:8px;">
+          <button id="profileSaveBtn" class="primary"><i class="fa-regular fa-floppy-disk" style="margin-right:4px;"></i>Сохранить</button>
+          <button id="profileCancelBtn">Отмена</button>
+        </div>
+      </div>
+    </div>
+    <div class="profile-field">
+      <label><i class="fa-solid fa-clock"></i>Время в MiFab</label>
+      <div class="value" id="profileTimer">0 мин. 0 сек.</div>
+    </div>
+    <button class="modal-close" id="profileCloseBtn">Закрыть</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="aboutModal">
+  <div class="modal-content" style="text-align:left;max-width:360px;">
+    <h2><i class="fa-regular fa-circle-info" style="color:#f0a8b9;margin-right:8px;"></i>О проекте</h2>
+    <p style="font-size:0.9rem;color:#4a4b52;margin-bottom:16px;line-height:1.5;font-family:'Inter',sans-serif;">
+      MiFab — хаб 3D-моделей MiSide от <strong>VALHAISTO GAMES</strong>
+    </p>
+    <div class="about-links">
+      <a href="https://discord.gg/FsrCUVhD3b" target="_blank"><i class="fa-brands fa-discord"></i><span>Discord</span><span class="link-arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
+      <a href="https://t.me/valhaisto" target="_blank"><i class="fa-brands fa-telegram"></i><span>Telegram</span><span class="link-arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
+      <a href="https://valhaisto-games.itch.io/" target="_blank"><i class="fa-brands fa-itch-io"></i><span>Itch.io</span><span class="link-arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
+      <a href="https://pay.cloudtips.ru/p/3bebcf1f" target="_blank"><i class="fa-solid fa-heart-circle-bolt"></i><span>CloudTips (Donate)</span><span class="link-arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
+      <a href="https://share.google/RwU0tskKKwRFXpDhf" target="_blank"><i class="fa-solid fa-shop"></i><span>RuStore</span><span class="link-arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
+      <a href="https://trashbox.ru/users/ayanokoji031/" target="_blank"><i class="fa-solid fa-box-open"></i><span>Trashbox</span><span class="link-arrow"><i class="fa-solid fa-arrow-right"></i></span></a>
+    </div>
+    <button class="modal-close" id="aboutCloseBtn" style="width:100%;">Закрыть</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-content">
+    <h2 id="modalTitle">Заголовок</h2>
+    <p id="modalText">Текст</p>
+    <button class="modal-close" id="modalCloseBtn">Закрыть</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <button class="hamburger" id="hamburgerBtn" aria-label="меню">
+        <span></span><span></span><span></span>
+      </button>
+      <img src="mifab.png" alt="MiFab Logo" class="logo-img" id="logoImg">
+    </div>
+    <div class="header-center">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Поиск моделей...">
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="uploadBtn" aria-label="загрузить"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
+      <div class="bell-wrapper icon-btn" id="bellBtn"><i class="fa-regular fa-bell"></i><span class="bell-dot"></span></div>
+      <div class="avatar" id="avatarBtn" role="img" aria-label="аватар"></div>
+    </div>
+  </header>
+
+  <!-- ГЛАВНАЯ СТРАНИЦА -->
+  <div id="mainPage">
+    <div class="filter-bar">
+      <div class="filter-wrapper">
+        <button class="filter-btn" id="filterCategoriesBtn"><i class="fa-regular fa-rectangle-list"></i> <span id="categoriesLabel">Категории</span></button>
+      </div>
+      <div class="filter-wrapper">
+        <button class="filter-btn" id="filterFiltersBtn"><i class="fa-solid fa-sliders"></i> <span id="filtersLabel">Фильтры</span></button>
+      </div>
+      <div class="filter-wrapper">
+        <button class="filter-btn" id="filterSortBtn"><i class="fa-solid fa-arrow-down-wide-short"></i> <span id="sortLabel">Сортировка</span></button>
+      </div>
+    </div>
+
+    <div class="community-stats"><span><i class="fa-regular fa-cubes"></i>Хаб 3D-моделей сообщества</span></div>
+    <div class="page-title">Модели <small>· <span id="modelCount">0</span></small></div>
+
+    <div class="tags-bar">
+      <span class="tag-item" data-tag="мита">#мита</span>
+      <span class="tag-item" data-tag="комната">#комната</span>
+      <span class="tag-item" data-tag="хоррор">#хоррор</span>
+      <span class="tag-item" data-tag="пиксели">#пиксели</span>
+      <span class="tag-item" data-tag="анимация">#анимация</span>
+      <span class="tag-item" data-tag="фан-арт">#фан-арт</span>
+      <span class="tag-item" data-tag="3d">#3d</span>
+    </div>
+
+    <div class="grid" id="modelsGrid"></div>
+    <div class="footer">By MiFab</div>
+  </div>
+
+  <!-- СТРАНИЦА МОДЕЛИ -->
+  <div class="model-page" id="modelPage">
+    <button class="back-btn" id="backToMain"><i class="fa-solid fa-arrow-left"></i> Назад на главную</button>
+
+    <model-viewer
+      id="modelViewer"
+      src=""
+      camera-controls
+      auto-rotate
+      touch-action="none"
+      ar
+      ar-modes="webxr scene-viewer quick-look"
+      shadow-intensity="1"
+      camera-orbit="0deg 75deg 2.5m"
+      min-camera-orbit="auto auto 0.5m"
+      max-camera-orbit="auto auto 30m"
+      style="width:100%; height:350px; background-color:#000000; border:1px solid #000000;"
+    ></model-viewer>
+
+    <div class="model-info-block">
+      <div class="model-title" id="modelDetailTitle">Комната Миты (Пустота)</div>
+      <div class="model-sub">3D Модель</div>
+      <div class="model-author-row">
+        <div class="author-avatar-lg"></div>
+        <span class="author-name-lg" id="modelDetailAuthor">by MiFab</span>
+        <button class="follow-btn" id="followBtn">ПОДПИСАТЬСЯ</button>
+      </div>
+      <div class="model-stats-row">
+        <span class="stat-item"><i class="fa-solid fa-arrow-down"></i> <span id="modelDownloads">0</span></span>
+        <span class="stat-item"><i class="fa-solid fa-eye"></i> <span id="modelViews">0</span></span>
+        <span class="stat-item"><i class="fa-solid fa-heart"></i> <span id="modelLikes">0</span></span>
+      </div>
+    </div>
+
+    <div class="model-actions-grid">
+      <a id="downloadLink" class="action-btn" style="text-decoration:none; color:#2a2b30; border-right:1px solid #000000; border-bottom:1px solid #000000;"><i class="fa-solid fa-arrow-down"></i> Скачать 3D Модель</a>
+      <button class="action-btn" id="addToBtn"><i class="fa-regular fa-heart"></i> Добавить в избранное</button>
+      <button class="action-btn" id="embedBtn"><i class="fa-solid fa-code"></i> Встроить</button>
+      <button class="action-btn" id="shareBtn"><i class="fa-solid fa-share-nodes"></i> Поделиться</button>
+      <button class="action-btn" id="reportBtn" style="grid-column: span 2; border-right: none;"><i class="fa-solid fa-flag"></i> Пожаловаться</button>
+    </div>
+
+    <div class="model-tech">
+      <span class="tech-item"><i class="fa-solid fa-draw-polygon"></i> Полигоны: <span id="modelPolygons">0</span></span>
+      <span class="tech-item"><i class="fa-solid fa-vector-square"></i> Вершины: <span id="modelVertices">0</span></span>
+    </div>
+
+    <div class="model-description" id="modelDescription">
+      Модель из игры MiSide. Авторство: @VALHAISTO_GAMES
+    </div>
+
+    <div class="model-license">
+      <i class="fa-regular fa-copyright"></i> Лицензия: CC Attribution • Опубликовано: 7 дней назад
+    </div>
+
+    <div class="model-tags" id="modelTags">
+      <span class="tag-rect">#мита</span>
+      <span class="tag-rect">#miside</span>
+      <span class="tag-rect">#3d</span>
+    </div>
+
+    <div class="model-comments">
+      <div class="comments-title"><i class="fa-regular fa-comment"></i> 0 комментариев</div>
+      <textarea class="comment-input" placeholder="Оставьте комментарий, поделитесь отзывом. Не стесняйтесь ;)"></textarea>
+    </div>
+
+    <div class="footer" style="border-top:1px solid #f0f0f2;margin-top:12px;">By MiFab</div>
+  </div>
+
+</div>
+
+<script>
+  (function() {
+    'use strict';
+
+    // ========================================================================
+    // БАЗА ДАННЫХ МОДЕЛЕЙ
+    // ========================================================================
+    const modelsData = [
+      { id: 1, name: 'Маленькая Мита', filename: 'tiny_mita.glb', category: 'Персонажи', views: 234, likes: 45, downloads: 12, polygons: '12.4k', vertices: '8.2k', description: 'Маленькая копия Миты.', tags: ['мита', 'персонаж'], hasAnimation: false },
+      { id: 2, name: 'Готическая Мита (Анимация)', filename: 'gothic_mita_animation.glb', category: 'Персонажи', views: 567, likes: 89, downloads: 34, polygons: '24.6k', vertices: '14.8k', description: 'Мити в готическом стиле.', tags: ['мита', 'анимация'], hasAnimation: true },
+      { id: 3, name: 'Безумная Мита', filename: 'crazy_mita.glb', category: 'Персонажи', views: 1234, likes: 234, downloads: 78, polygons: '18.2k', vertices: '11.5k', description: 'Основная модель Безумной Миты.', tags: ['мита', 'персонаж'], hasAnimation: false },
+      { id: 4, name: 'Мила', filename: 'mila.glb', category: 'Персонажи', views: 456, likes: 67, downloads: 23, polygons: '15.8k', vertices: '9.3k', description: 'Модель Милы — подруги Миты.', tags: ['мита', 'персонаж'], hasAnimation: false },
+      { id: 5, name: 'Кепочка', filename: 'cap_mita.glb', category: 'Персонажи', views: 789, likes: 123, downloads: 45, polygons: '16.1k', vertices: '10.0k', description: 'Мита в кепке.', tags: ['мита', 'персонаж'], hasAnimation: false },
+      { id: 6, name: 'Добрая Мита', filename: 'kind_mita.glb', category: 'Персонажи', views: 345, likes: 56, downloads: 18, polygons: '14.5k', vertices: '8.7k', description: 'Мита с добрым выражением лица.', tags: ['мита', 'персонаж'], hasAnimation: false },
+      { id: 7, name: 'Сонная Мита', filename: 'sleepy_mita.glb', category: 'Персонажи', views: 678, likes: 90, downloads: 31, polygons: '15.2k', vertices: '9.1k', description: 'Мита с закрытыми глазами.', tags: ['мита', 'персонаж'], hasAnimation: false },
+      { id: 8, name: 'Коротковолосая Мита', filename: 'short_hair_mita.glb', category: 'Персонажи', views: 456, likes: 78, downloads: 26, polygons: '16.8k', vertices: '10.2k', description: 'Мита с короткой стрижкой.', tags: ['мита', 'персонаж'], hasAnimation: false },
+      { id: 9, name: 'Мила в полотенце', filename: 'mila_in_towel.glb', category: 'Персонажи', views: 890, likes: 145, downloads: 52, polygons: '14.9k', vertices: '8.9k', description: 'Мила в полотенце.', tags: ['мита', 'персонаж'], hasAnimation: false },
+      { id: 10, name: 'Ядро Миты', filename: 'mitacore.glb', category: 'Персонажи', views: 234, likes: 34, downloads: 9, polygons: '22.4k', vertices: '14.1k', description: 'Внутренняя структура Миты.', tags: ['мита'], hasAnimation: false },
+      { id: 11, name: 'Прототип Безумной Миты', filename: 'prototype_crazy_mita.glb', category: 'Персонажи', views: 567, likes: 89, downloads: 27, polygons: '19.3k', vertices: '12.0k', description: 'Ранняя версия Безумной Миты.', tags: ['мита', 'персонаж'], hasAnimation: false },
+      { id: 12, name: 'Обнажённая Мита', filename: 'nude_mita.glb', category: 'Персонажи', views: 1234, likes: 234, downloads: 89, polygons: '17.8k', vertices: '10.9k', description: 'Базовая модель Миты без одежды.', tags: ['мита', 'персонаж'], hasAnimation: false },
+      { id: 13, name: 'Сонная Мита (Анимация)', filename: 'sleepy_mita_animation.glb', category: 'Персонажи', views: 678, likes: 102, downloads: 38, polygons: '16.5k', vertices: '9.8k', description: 'Сонная Мита.', tags: ['мита', 'анимация'], hasAnimation: true },
+      { id: 14, name: 'Манекен Мита', filename: 'dummy_mita.glb', category: 'Персонажи', views: 345, likes: 45, downloads: 14, polygons: '8.2k', vertices: '5.1k', description: 'Упрощённая модель для тестов.', tags: ['мита'], hasAnimation: false },
+      { id: 15, name: 'Мита-Вампир', filename: 'mita_vampire.glb', category: 'Персонажи', views: 789, likes: 134, downloads: 43, polygons: '20.1k', vertices: '12.5k', description: 'Мита в образе вампира.', tags: ['мита', 'персонаж'], hasAnimation: false },
+      { id: 16, name: 'Призрачная Мита', filename: 'mita_ghostly.glb', category: 'Персонажи', views: 456, likes: 67, downloads: 21, polygons: '18.7k', vertices: '11.3k', description: 'Призрачная модель Миты.', tags: ['мита', 'хоррор'], hasAnimation: false },
+      { id: 17, name: 'Безумная Мита (Анимация)', filename: 'mita_animation.glb', category: 'Персонажи', views: 1234, likes: 256, downloads: 67, polygons: '19.8k', vertices: '12.1k', description: 'Анимированная Безумная Мита.', tags: ['мита', 'анимация'], hasAnimation: true },
+      { id: 18, name: 'Незавершённая Мита', filename: 'unfinished_mita.glb', category: 'Персонажи', views: 234, likes: 34, downloads: 8, polygons: '14.3k', vertices: '8.5k', description: 'Незавершённая модель Миты.', tags: ['мита'], hasAnimation: false },
+      { id: 19, name: 'Блуждающая Мита', filename: 'wandering_mita.glb', category: 'Персонажи', views: 567, likes: 78, downloads: 29, polygons: '17.2k', vertices: '10.4k', description: 'Блуждающая Мита.', tags: ['мита', 'персонаж'], hasAnimation: false },
+      { id: 20, name: 'Локация MiSide', filename: 'miside_mita.glb', category: 'Локации', views: 2345, likes: 456, downloads: 123, polygons: '22.0k', vertices: '13.5k', description: 'Основная модель локации из игры MiSide.', tags: ['мита', 'персонаж'], hasAnimation: false },
+      { id: 21, name: 'Игрок 1 (Анимация)', filename: 'player1_animation.zip', category: 'Персонажи', views: 345, likes: 45, downloads: 15, polygons: 'N/A', vertices: 'N/A', description: 'Анимация игрока 1 в ZIP. ZIP не поддерживает 3D просмотр, скачайте и пробуйте.', tags: ['анимация'], hasAnimation: true, isZip: true },
+      { id: 22, name: 'Игрок 1', filename: 'miside_player.glb', category: 'Персонажи', views: 678, likes: 89, downloads: 34, polygons: '16.7k', vertices: '10.1k', description: 'Модель игрока из MiSide.', tags: ['персонаж'], hasAnimation: false },
+      { id: 23, name: 'Зеркальный Монстр', filename: 'mirror_beast.glb', category: 'Персонажи', views: 456, likes: 67, downloads: 19, polygons: '25.3k', vertices: '16.2k', description: 'Существо в зеркале.', tags: ['хоррор'], hasAnimation: false },
+      { id: 24, name: 'Манекен Мита (Анимация)', filename: 'dummy_mita_animation.glb', category: 'Персонажи', views: 234, likes: 34, downloads: 11, polygons: '9.1k', vertices: '5.6k', description: 'Анимированная тестовая модель.', tags: ['мита', 'анимация'], hasAnimation: true },
+      { id: 25, name: 'Поза Миты', filename: 'pose_mita.glb', category: 'Персонажи', views: 567, likes: 78, downloads: 26, polygons: '16.3k', vertices: '9.9k', description: 'Мита в статичной позе.', tags: ['мита', 'персонаж'], hasAnimation: false },
+      { id: 26, name: 'Ходячая Мита (Анимация)', filename: 'walking_mita.glb', category: 'Персонажи', views: 789, likes: 123, downloads: 41, polygons: '17.5k', vertices: '10.7k', description: 'Мита с анимацией ходьбы.', tags: ['мита', 'анимация'], hasAnimation: true },
+      { id: 27, name: 'Спальня Миты', filename: 'misidebedroom.glb', category: 'Локации', views: 1234, likes: 234, downloads: 67, polygons: '45.2k', vertices: '28.1k', description: 'Комната Миты из игры.', tags: ['комната', 'локация'], hasAnimation: false },
+      { id: 28, name: 'Петля', filename: 'the_loop.glb', category: 'Локации', views: 567, likes: 89, downloads: 23, polygons: '38.5k', vertices: '24.0k', description: 'Бесконечная петля.', tags: ['локация', 'хоррор'], hasAnimation: false },
+      { id: 29, name: 'Клетка', filename: 'the_cage.zip', category: 'Локации', views: 345, likes: 45, downloads: 12, polygons: 'N/A', vertices: 'N/A', description: 'Клетка в ZIP. ZIP не поддерживает 3D просмотр, скачайте и пробуйте.', tags: ['локация', 'хоррор'], hasAnimation: false, isZip: true },
+      { id: 30, name: 'За пределами мира', filename: 'beyond_the_world.zip', category: 'Локации', views: 234, likes: 34, downloads: 9, polygons: 'N/A', vertices: 'N/A', description: 'Локация в ZIP. ZIP не поддерживает 3D просмотр, скачайте и пробуйте.', tags: ['локация'], hasAnimation: false, isZip: true },
+      { id: 31, name: 'Ядро', filename: 'the_core.zip', category: 'Локации', views: 456, likes: 56, downloads: 14, polygons: 'N/A', vertices: 'N/A', description: 'Центральная локация в ZIP. ZIP не поддерживает 3D просмотр, скачайте и пробуйте.', tags: ['локация'], hasAnimation: false, isZip: true },
+      { id: 32, name: 'Подвал', filename: 'the_basement.usdz', category: 'Локации', views: 678, likes: 78, downloads: 21, polygons: '32.4k', vertices: '19.8k', description: 'Подвал в USDZ. USDZ не поддерживает 3D просмотр на Android, скачайте и пробуйте. На iOS работает через AR Quick Look.', tags: ['локация', 'хоррор'], hasAnimation: false, isUsdz: true },
+      { id: 33, name: 'Комната Кепочки', filename: 'miside_cappies_room.usdz', category: 'Локации', views: 789, likes: 89, downloads: 28, polygons: '28.7k', vertices: '17.5k', description: 'Комната Кеппи в USDZ. USDZ не поддерживает 3D просмотр на Android, скачайте и пробуйте. На iOS работает через AR Quick Look.', tags: ['комната', 'локация'], hasAnimation: false, isUsdz: true },
+      { id: 34, name: 'Переходы', filename: 'passages.zip', category: 'Локации', views: 234, likes: 23, downloads: 8, polygons: 'N/A', vertices: 'N/A', description: 'Переходы в ZIP. ZIP не поддерживает 3D просмотр, скачайте и пробуйте.', tags: ['локация'], hasAnimation: false, isZip: true },
+      { id: 35, name: 'Комната Призрачной Миты', filename: 'ghostly_mita_room.glb', category: 'Локации', views: 567, likes: 67, downloads: 19, polygons: '36.8k', vertices: '22.3k', description: 'Призрачная комната Миты.', tags: ['комната', 'хоррор'], hasAnimation: false },
+      { id: 36, name: 'Кухня MiSide', filename: 'miside_kitchen.glb', category: 'Локации', views: 890, likes: 123, downloads: 34, polygons: '42.1k', vertices: '26.5k', description: 'Кухня из игры MiSide.', tags: ['локация'], hasAnimation: false },
+      { id: 37, name: 'Спальня Игрока', filename: 'player_bedroom.zip', category: 'Локации', views: 345, likes: 45, downloads: 13, polygons: 'N/A', vertices: 'N/A', description: 'Спальня игрока в ZIP. ZIP не поддерживает 3D просмотр, скачайте и пробуйте.', tags: ['комната', 'локация'], hasAnimation: false, isZip: true },
+      { id: 38, name: 'Комната Уровня 4', filename: 'level_4_miside.usdz', category: 'Локации', views: 456, likes: 56, downloads: 16, polygons: '34.2k', vertices: '20.7k', description: 'Уровень 4 в USDZ. USDZ не поддерживает 3D просмотр на Android, скачайте и пробуйте. На iOS работает через AR Quick Look.', tags: ['локация'], hasAnimation: false, isUsdz: true },
+      { id: 39, name: 'Беги и Прячься!', filename: 'run_and_hide.usdz', category: 'Локации', views: 678, likes: 78, downloads: 22, polygons: '30.5k', vertices: '18.9k', description: 'Локация в USDZ. USDZ не поддерживает 3D просмотр на Android, скачайте и пробуйте. На iOS работает через AR Quick Look.', tags: ['локация', 'хоррор'], hasAnimation: false, isUsdz: true },
+      { id: 40, name: 'Бензопила', filename: 'chainsaw_miside.glb', category: 'Предметы', views: 567, likes: 67, downloads: 23, polygons: '8.4k', vertices: '5.2k', description: 'Бензопила из игры.', tags: ['предмет'], hasAnimation: false },
+      { id: 41, name: 'Ручная консоль', filename: 'handheld_console.glb', category: 'Предметы', views: 234, likes: 34, downloads: 12, polygons: '6.2k', vertices: '3.8k', description: 'Игровая консоль.', tags: ['предмет'], hasAnimation: false },
+      { id: 42, name: 'Радио', filename: 'radio_miside.glb', category: 'Предметы', views: 345, likes: 45, downloads: 15, polygons: '5.7k', vertices: '3.4k', description: 'Радиоприёмник.', tags: ['предмет'], hasAnimation: false },
+      { id: 43, name: 'Постер Миты (Лето)', filename: 'poster_mita.glb', category: 'Предметы', views: 456, likes: 56, downloads: 18, polygons: '4.1k', vertices: '2.5k', description: 'Плакат с Митой.', tags: ['предмет', 'мита'], hasAnimation: false },
+      { id: 44, name: 'Стол', filename: 'miside_table_room.glb', category: 'Предметы', views: 678, likes: 78, downloads: 24, polygons: '7.8k', vertices: '4.7k', description: 'Стол из комнаты.', tags: ['предмет'], hasAnimation: false },
+      { id: 45, name: 'Кнопка', filename: 'button_miside.glb', category: 'Предметы', views: 123, likes: 12, downloads: 5, polygons: '2.3k', vertices: '1.4k', description: 'Нажимная кнопка.', tags: ['предмет'], hasAnimation: false },
+      { id: 46, name: 'Кепка', filename: 'cap_miside.glb', category: 'Предметы', views: 234, likes: 23, downloads: 9, polygons: '3.2k', vertices: '1.9k', description: 'Кепка для персонажа.', tags: ['предмет'], hasAnimation: false },
+      { id: 47, name: 'Пистолет Кепочки', filename: 'gun_miside.glb', category: 'Предметы', views: 789, likes: 89, downloads: 31, polygons: '9.5k', vertices: '5.8k', description: 'Пистолет из игры.', tags: ['предмет'], hasAnimation: false },
+      { id: 48, name: 'Гитара Кепочки', filename: 'guitar_miside.glb', category: 'Предметы', views: 456, likes: 56, downloads: 18, polygons: '7.2k', vertices: '4.3k', description: 'Гитара в стиле Кеппи.', tags: ['предмет'], hasAnimation: false },
+      { id: 49, name: 'Молот Кепочки', filename: 'mallet_miside.glb', category: 'Предметы', views: 345, likes: 34, downloads: 14, polygons: '6.8k', vertices: '4.1k', description: 'Молот персонажа.', tags: ['предмет'], hasAnimation: false },
+      { id: 50, name: 'Пистолет Хетора', filename: 'mita_gun_in_hetoor.glb', category: 'Предметы', views: 567, likes: 67, downloads: 22, polygons: '8.9k', vertices: '5.4k', description: 'Пистолет в стиле Хетора.', tags: ['предмет'], hasAnimation: false }
+    ];
+
+    const PLACEHOLDER_MODEL = 'tiny_mita.glb';
+
+    // ========================================================================
+    // РЕНДЕРИНГ КАРТОЧЕК
+    // ========================================================================
+    const grid = document.getElementById('modelsGrid');
+    const modelCount = document.getElementById('modelCount');
+
+    function renderCards(data) {
+      grid.innerHTML = '';
+      data.forEach((model, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.index = index;
+
+        const ext = model.filename.split('.').pop().toLowerCase();
+        let previewSrc = model.filename;
+        if (ext === 'zip' || ext === 'usdz') {
+          previewSrc = PLACEHOLDER_MODEL;
+        }
+
+        let formatBadge = ext.toUpperCase();
+        if (model.isUsdz) formatBadge = 'USDZ';
+        if (model.isZip) formatBadge = 'ZIP';
+
+        card.innerHTML = `
+          <div class="card-preview">
+            <model-viewer
+              src="${previewSrc}"
+              camera-controls
+              auto-rotate
+              touch-action="none"
+              camera-orbit="0deg 75deg 2.5m"
+              min-camera-orbit="auto auto 0.8m"
+              max-camera-orbit="auto auto 10m"
+              style="width:100%; height:100%; background-color:#0d0e12; --poster-color:#0d0e12;"
+              loading="lazy"
+              reveal="auto"
+              interaction-prompt="none"
+            ></model-viewer>
+            <div class="preview-overlay"><i class="fa-solid fa-cube"></i> ${formatBadge}</div>
+          </div>
+          <div class="card-footer">
+            <div class="card-footer-top">
+              <div class="avatar-small"></div>
+              <div class="card-info">
+                <span class="model-name">${model.name}</span>
+                <span class="author-name"><i class="fa-regular fa-user"></i> By MiFab</span>
+              </div>
+            </div>
+            <div class="card-stats-row">
+              <span class="by-mifab">By MiFab</span>
+              <div class="stats-group">
+                <span class="stat-item"><i class="fa-solid fa-eye"></i> <span class="views-count">${formatNumber(model.views)}</span></span>
+                <span class="stat-item like-btn" data-liked="false"><i class="fa-regular fa-heart"></i> <span class="likes-count">${model.likes}</span></span>
+              </div>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      modelCount.textContent = data.length;
+      attachCardEvents();
+    }
+
+    function formatNumber(num) {
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+      return num;
+    }
+
+    // ========================================================================
+    // ЛАЙКИ
+    // ========================================================================
+    function attachCardEvents() {
+      document.querySelectorAll('.like-btn').forEach(function(btn) {
+        btn.removeEventListener('click', handleLike);
+        btn.addEventListener('click', handleLike);
+      });
+    }
+
+    function handleLike(e) {
+      e.stopPropagation();
+      const btn = e.currentTarget;
+      const isLiked = btn.dataset.liked === 'true';
+      const heartIcon = btn.querySelector('i');
+      const countSpan = btn.querySelector('.likes-count');
+      let count = parseInt(countSpan.textContent.replace(/\s/g, '')) || 0;
+
+      if (isLiked) {
+        btn.dataset.liked = 'false';
+        heartIcon.className = 'fa-regular fa-heart';
+        btn.classList.remove('liked');
+        count -= 1;
+      } else {
+        btn.dataset.liked = 'true';
+        heartIcon.className = 'fa-solid fa-heart';
+        btn.classList.add('liked');
+        count += 1;
+      }
+      countSpan.textContent = count;
+    }
+
+    // ========================================================================
+    // ФИЛЬТРАЦИЯ И ПОИСК
+    // ========================================================================
+    let currentTagFilter = null;
+    let currentCategoryFilter = null;
+    let currentSortType = 'default';
+
+    function filterAndRender() {
+      let filtered = [...modelsData];
+
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      if (query) {
+        filtered = filtered.filter(m => m.name.toLowerCase().includes(query));
+      }
+
+      if (currentCategoryFilter) {
+        filtered = filtered.filter(m => m.category === currentCategoryFilter);
+      }
+
+      if (currentTagFilter) {
+        filtered = filtered.filter(m => m.tags && m.tags.includes(currentTagFilter));
+      }
+
+      if (currentSortType === 'popular') {
+        filtered.sort((a, b) => (b.views + b.likes) - (a.views + a.likes));
+      } else if (currentSortType === 'new') {
+        filtered.sort((a, b) => b.id - a.id);
+      } else if (currentSortType === 'alphabet') {
+        filtered.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+      }
+
+      renderCards(filtered);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', filterAndRender);
+
+    // ========================================================================
+    // ТЕГИ
+    // ========================================================================
+    document.querySelectorAll('.tag-item').forEach(function(tag) {
+      tag.addEventListener('click', function() {
+        const tagValue = this.dataset.tag;
+        if (currentTagFilter === tagValue) {
+          currentTagFilter = null;
+          this.style.background = '#f0eef0';
+          this.style.color = '#4a4b52';
+        } else {
+          currentTagFilter = tagValue;
+          document.querySelectorAll('.tag-item').forEach(t => {
+            t.style.background = '#f0eef0';
+            t.style.color = '#4a4b52';
+          });
+          this.style.background = '#2a2b30';
+          this.style.color = '#ffffff';
+        }
+        filterAndRender();
+      });
+    });
+
+    // ========================================================================
+    // ОТКРЫТИЕ СТРАНИЦЫ МОДЕЛИ
+    // ========================================================================
+    const modelViewer = document.getElementById('modelViewer');
+    const downloadLink = document.getElementById('downloadLink');
+    const modelDetailTitle = document.getElementById('modelDetailTitle');
+    const modelDetailAuthor = document.getElementById('modelDetailAuthor');
+    const modelDownloads = document.getElementById('modelDownloads');
+    const modelViews = document.getElementById('modelViews');
+    const modelLikes = document.getElementById('modelLikes');
+    const modelPolygons = document.getElementById('modelPolygons');
+    const modelVertices = document.getElementById('modelVertices');
+    const modelDescription = document.getElementById('modelDescription');
+    const modelTags = document.getElementById('modelTags');
+
+    let currentModelData = null;
+
+    function openModelPage(index) {
+      const model = modelsData[index];
+      if (!model) return;
+      currentModelData = model;
+
+      const ext = model.filename.split('.').pop().toLowerCase();
+
+      // Настройка плеера
+      if (ext === 'glb') {
+        modelViewer.src = model.filename;
+        modelViewer.removeAttribute('ios-src');
+      } else if (ext === 'usdz') {
+        // Для USDZ — показываем заглушку на Android, на iOS работает через ios-src
+        modelViewer.src = PLACEHOLDER_MODEL;
+        modelViewer.setAttribute('ios-src', model.filename);
+      } else if (ext === 'zip') {
+        // Для ZIP — заглушка
+        modelViewer.src = PLACEHOLDER_MODEL;
+        modelViewer.removeAttribute('ios-src');
+      } else {
+        modelViewer.src = PLACEHOLDER_MODEL;
+        modelViewer.removeAttribute('ios-src');
+      }
+
+      // Обновляем информацию
+      modelDetailTitle.textContent = model.name;
+      modelDetailAuthor.textContent = 'by MiFab';
+      modelDownloads.textContent = model.downloads;
+      modelViews.textContent = formatNumber(model.views);
+      modelLikes.textContent = model.likes;
+      modelPolygons.textContent = model.polygons || 'N/A';
+      modelVertices.textContent = model.vertices || 'N/A';
+      
+      // Обновляем описание с учётом формата
+      let desc = model.description || 'Модель из игры MiSide.';
+      if (model.isUsdz) {
+        desc = 'USDZ — доступно на iOS через AR Quick Look. На Android скачайте и откройте в поддерживающем приложении. ' + desc;
+      }
+      if (model.isZip) {
+        desc = 'ZIP архив — скачайте и распакуйте. ' + desc;
+      }
+      if (model.hasAnimation && ext === 'glb') {
+        desc = 'Анимации есть, но их надо запустить в других программах (Blender, Unity и т.д.). ' + desc;
+      }
+      modelDescription.textContent = desc;
+
+      const tagMap = {
+        'Персонажи': '#мита #персонаж #miside',
+        'Локации': '#локация #мир #miside',
+        'Предметы': '#предмет #объект #miside'
+      };
+      const tags = tagMap[model.category] || '#мита #miside #3d';
+      modelTags.innerHTML = tags.split(' ').map(t => `<span class="tag-rect">${t}</span>`).join('');
+
+      // Ссылка для скачивания — оригинальный файл
+      downloadLink.href = model.filename;
+      downloadLink.download = model.filename;
+
+      // Сбрасываем состояние кнопок
+      document.getElementById('followBtn').classList.remove('following');
+      document.getElementById('followBtn').textContent = 'ПОДПИСАТЬСЯ';
+      document.getElementById('addToBtn').innerHTML = '<i class="fa-regular fa-heart"></i> Добавить в избранное';
+      document.getElementById('addToBtn').classList.remove('added');
+
+      document.getElementById('mainPage').style.display = 'none';
+      document.getElementById('modelPage').classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeModelPage() {
+      document.getElementById('mainPage').style.display = 'block';
+      document.getElementById('modelPage').classList.remove('active');
+      modelViewer.src = '';
+      modelViewer.removeAttribute('ios-src');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Клик по карточке
+    document.addEventListener('click', function(e) {
+      const card = e.target.closest('.card');
+      if (card && !e.target.closest('.like-btn')) {
+        const index = parseInt(card.dataset.index);
+        if (!isNaN(index)) {
+          const nameEl = card.querySelector('.model-name');
+          if (nameEl) {
+            const modelName = nameEl.textContent;
+            const realIndex = modelsData.findIndex(m => m.name === modelName);
+            if (realIndex !== -1) openModelPage(realIndex);
+          }
+        }
+      }
+    });
+
+    document.getElementById('backToMain').addEventListener('click', closeModelPage);
+
+    // ========================================================================
+    // КНОПКА "ВСТРОИТЬ"
+    // ========================================================================
+    document.getElementById('embedBtn').addEventListener('click', function() {
+      const modelName = currentModelData ? currentModelData.name : 'Модель';
+      const embedCode = `<model-viewer src="${currentModelData ? currentModelData.filename : ''}" camera-controls auto-rotate style="width:100%; height:400px;"></model-viewer>`;
+      navigator.clipboard.writeText(embedCode).then(() => {
+        showModal('Встроить', 'Код для вставки скопирован в буфер обмена!');
+      }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = embedCode;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showModal('Встроить', 'Код для вставки скопирован в буфер обмена!');
+      });
+    });
+
+    // ========================================================================
+    // КНОПКА "ПОДПИСАТЬСЯ"
+    // ========================================================================
+    document.getElementById('followBtn').addEventListener('click', function() {
+      this.classList.toggle('following');
+      this.textContent = this.classList.contains('following') ? 'ОТПИСАТЬСЯ' : 'ПОДПИСАТЬСЯ';
+      showModal('Подписка', this.classList.contains('following') ? 'Вы подписались!' : 'Вы отписались.');
+    });
+
+    // ========================================================================
+    // КНОПКА "ДОБАВИТЬ В ИЗБРАННОЕ"
+    // ========================================================================
+    document.getElementById('addToBtn').addEventListener('click', function() {
+      this.classList.toggle('added');
+      const isAdded = this.classList.contains('added');
+      this.innerHTML = isAdded ? '<i class="fa-solid fa-heart" style="color:#f0a8b9;"></i> В избранном' : '<i class="fa-regular fa-heart"></i> Добавить в избранное';
+      showModal('Избранное', isAdded ? 'Модель добавлена в избранное!' : 'Модель удалена из избранного.');
+    });
+
+    // ========================================================================
+    // КНОПКА "ПОДЕЛИТЬСЯ"
+    // ========================================================================
+    document.getElementById('shareBtn').addEventListener('click', function() {
+      const url = window.location.href;
+      const title = currentModelData ? currentModelData.name : 'MiFab 3D модель';
+
+      if (navigator.share) {
+        navigator.share({
+          title: title,
+          text: 'Посмотрите 3D модель на MiFab!',
+          url: url
+        }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(url).then(() => {
+          showModal('Поделиться', 'Ссылка скопирована в буфер обмена!');
+        }).catch(() => {
+          const textarea = document.createElement('textarea');
+          textarea.value = url;
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+          showModal('Поделиться', 'Ссылка скопирована в буфер обмена!');
+        });
+      }
+    });
+
+    // ========================================================================
+    // КНОПКА "ПОЖАЛОВАТЬСЯ"
+    // ========================================================================
+    document.getElementById('reportBtn').addEventListener('click', function() {
+      const modelName = currentModelData ? currentModelData.name : 'Модель';
+      const subject = encodeURIComponent('Жалоба на модель: ' + modelName);
+      const body = encodeURIComponent(
+        'Здравствуйте, VALHAISTO!\n\n' +
+        'Я хочу пожаловаться на 3D модель "' + modelName + '" на сайте MiFab.\n' +
+        'Причина жалобы: [опишите причину здесь]\n\n' +
+        'Ссылка на модель: ' + window.location.href + '\n\n' +
+        'С уважением.'
+      );
+      window.location.href = 'mailto:nazimkuvandykov14@gmail.com?subject=' + subject + '&body=' + body;
+    });
+
+    // ========================================================================
+    // КНОПКА "ЗАГРУЗИТЬ" (В ШАПКЕ)
+    // ========================================================================
+    let currentNick = '';
+
+    document.getElementById('uploadBtn').addEventListener('click', function() {
+      const subject = encodeURIComponent('Новая 3D Модель для MiFab');
+      const body = encodeURIComponent(
+        'Привет, VALHAISTO!\n\n' +
+        'Я хочу опубликовать свою 3D модель на MiFab.\n' +
+        'Прикрепляю файл (.gltf/.fbx/.obj) и текстуры к этому письму.\n' +
+        'Мой никнейм на сайте: ' + currentNick + '\n\n' +
+        'Спасибо!'
+      );
+      window.location.href = 'mailto:nazimkuvandykov14@gmail.com?subject=' + subject + '&body=' + body;
+    });
+
+    // ========================================================================
+    // ФИЛЬТРЫ (position: fixed)
+    // ========================================================================
+    function setupDropdown(btnId, dropdownId, labelId, callback) {
+      const btn = document.getElementById(btnId);
+      const dropdown = document.getElementById(dropdownId);
+      const label = document.getElementById(labelId);
+      if (!btn || !dropdown) return;
+
+      let activeDropdown = null;
+
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+
+        document.querySelectorAll('.dropdown-content').forEach(function(d) {
+          d.classList.remove('show');
+        });
+
+        if (activeDropdown === dropdown) {
+          activeDropdown = null;
+          return;
+        }
+
+        const rect = btn.getBoundingClientRect();
+        dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
+        dropdown.style.left = (rect.left + window.scrollX) + 'px';
+        dropdown.classList.add('show');
+        activeDropdown = dropdown;
+
+        dropdown.querySelectorAll('li').forEach(function(item) {
+          item.onclick = function(e) {
+            e.stopPropagation();
+            const value = this.dataset.value || this.textContent.trim();
+            if (label) {
+              label.textContent = value;
+            }
+            btn.classList.add('active');
+            dropdown.classList.remove('show');
+            activeDropdown = null;
+
+            if (callback) callback(value);
+            filterAndRender();
+          };
+        });
+      });
+    }
+
+    setupDropdown('filterCategoriesBtn', 'dropdown-categories', 'categoriesLabel', function(value) {
+      if (value === 'Персонажи' || value === 'Локации' || value === 'Предметы') {
+        currentCategoryFilter = value;
+      } else {
+        currentCategoryFilter = null;
+      }
+    });
+
+    setupDropdown('filterFiltersBtn', 'dropdown-filters', 'filtersLabel', function(value) {
+      if (value === 'Популярные') {
+        currentSortType = 'popular';
+      } else if (value === 'Новые') {
+        currentSortType = 'new';
+      } else if (value === 'По алфавиту') {
+        currentSortType = 'alphabet';
+      }
+    });
+
+    setupDropdown('filterSortBtn', 'dropdown-sort', 'sortLabel', function(value) {
+      if (value === 'popular') {
+        currentSortType = 'popular';
+      } else if (value === 'new') {
+        currentSortType = 'new';
+      } else if (value === 'alphabet') {
+        currentSortType = 'alphabet';
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      const isInside = e.target.closest('.filter-btn') || e.target.closest('.dropdown-content');
+      if (!isInside) {
+        document.querySelectorAll('.dropdown-content').forEach(function(d) {
+          d.classList.remove('show');
+        });
+      }
+    });
+
+    window.addEventListener('scroll', function() {
+      document.querySelectorAll('.dropdown-content.show').forEach(function(dropdown) {
+        const btn = document.querySelector('.filter-btn.active');
+        if (btn) {
+          const rect = btn.getBoundingClientRect();
+          dropdown.style.top = (rect.bottom + window.scrollY) + 'px';
+          dropdown.style.left = (rect.left + window.scrollX) + 'px';
+        }
+      });
+    });
+
+    // ========================================================================
+    // ПРОФИЛЬ И ТАЙМЕР
+    // ========================================================================
+    const PROFILE_KEY = 'mifab_profile_nickname';
+    const SESSION_KEY = 'mifab_session_start';
+
+    function getRandomNick() {
+      const prefixes = ['MitaFan', 'Guest', 'Pixel', 'Neon', 'Void', 'MitaLover', '3D_Explorer'];
+      const num = Math.floor(Math.random() * 9000 + 1000);
+      return prefixes[Math.floor(Math.random() * prefixes.length)] + '_' + num;
+    }
+
+    currentNick = localStorage.getItem(PROFILE_KEY);
+    if (!currentNick) {
+      currentNick = getRandomNick();
+      localStorage.setItem(PROFILE_KEY, currentNick);
+    }
+
+    let sessionStart = localStorage.getItem(SESSION_KEY);
+    if (!sessionStart) {
+      sessionStart = Date.now().toString();
+      localStorage.setItem(SESSION_KEY, sessionStart);
+    }
+    const startTime = parseInt(sessionStart);
+
+    const profileNickname = document.getElementById('profileNickname');
+    const profileTimer = document.getElementById('profileTimer');
+
+    function updateProfileDisplay() {
+      if (profileNickname) profileNickname.textContent = currentNick;
+    }
+    updateProfileDisplay();
+
+    function updateTimer() {
+      const now = Date.now();
+      const diff = Math.floor((now - startTime) / 1000);
+      const mins = Math.floor(diff / 60);
+      const secs = diff % 60;
+      if (profileTimer) {
+        profileTimer.textContent = mins + ' мин. ' + secs + ' сек.';
+      }
+    }
+    updateTimer();
+    setInterval(updateTimer, 1000);
+
+    // ========================================================================
+    // МОДАЛЬНЫЕ ОКНА
+    // ========================================================================
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalText = document.getElementById('modalText');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+    function showModal(title, text) {
+      if (modalTitle) modalTitle.textContent = title;
+      if (modalText) modalText.textContent = text;
+      if (modalOverlay) modalOverlay.classList.add('active');
+    }
+    function hideModal() {
+      if (modalOverlay) modalOverlay.classList.remove('active');
+    }
+    if (modalCloseBtn) modalCloseBtn.addEventListener('click', hideModal);
+    if (modalOverlay) {
+      modalOverlay.addEventListener('click', function(e) {
+        if (e.target === this) hideModal();
+      });
+    }
+
+    // ========================================================================
+    // АВАТАРКА
+    // ========================================================================
+    const avatarBtn = document.getElementById('avatarBtn');
+    const profileModal = document.getElementById('profileModal');
+    const profileCloseBtn = document.getElementById('profileCloseBtn');
+
+    if (avatarBtn) avatarBtn.addEventListener('click', function() {
+      updateTimer();
+      updateProfileDisplay();
+      if (profileModal) profileModal.classList.add('active');
+    });
+    if (profileCloseBtn) profileCloseBtn.addEventListener('click', function() {
+      if (profileModal) profileModal.classList.remove('active');
+    });
+    if (profileModal) {
+      profileModal.addEventListener('click', function(e) {
+        if (e.target === this) profileModal.classList.remove('active');
+      });
+    }
+
+    const profileEditBtn = document.getElementById('profileEditBtn');
+    const profileEditContainer = document.getElementById('profileEditContainer');
+    const profileNickInput = document.getElementById('profileNickInput');
+    const profileSaveBtn = document.getElementById('profileSaveBtn');
+    const profileCancelBtn = document.getElementById('profileCancelBtn');
+
+    if (profileEditBtn) {
+      profileEditBtn.addEventListener('click', function() {
+        if (profileNickInput) profileNickInput.value = currentNick;
+        if (profileEditContainer) profileEditContainer.style.display = 'block';
+        if (profileEditBtn) profileEditBtn.style.display = 'none';
+        if (profileNickInput) profileNickInput.focus();
+      });
+    }
+    if (profileCancelBtn) {
+      profileCancelBtn.addEventListener('click', function() {
+        if (profileEditContainer) profileEditContainer.style.display = 'none';
+        if (profileEditBtn) profileEditBtn.style.display = 'inline-block';
+      });
+    }
+    if (profileSaveBtn) {
+      profileSaveBtn.addEventListener('click', function() {
+        if (!profileNickInput) return;
+        const newNick = profileNickInput.value.trim();
+        if (newNick && newNick.length > 0) {
+          currentNick = newNick;
+          localStorage.setItem(PROFILE_KEY, currentNick);
+          updateProfileDisplay();
+          if (profileEditContainer) profileEditContainer.style.display = 'none';
+          if (profileEditBtn) profileEditBtn.style.display = 'inline-block';
+          showModal('Успех', 'Никнейм изменён на: ' + currentNick);
+        } else {
+          alert('Введите корректный никнейм');
+        }
+      });
+    }
+
+    // ========================================================================
+    // SIDEBAR
+    // ========================================================================
+    const hamburger = document.getElementById('hamburgerBtn');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+    function openSidebar() {
+      if (sidebar) sidebar.classList.add('active');
+      if (sidebarOverlay) sidebarOverlay.classList.add('active');
+    }
+    function closeSidebar() {
+      if (sidebar) sidebar.classList.remove('active');
+      if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+    }
+    if (hamburger) hamburger.addEventListener('click', openSidebar);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+
+    const menuHome = document.getElementById('menuHome');
+    const menuUpload = document.getElementById('menuUpload');
+    const menuProfile = document.getElementById('menuProfile');
+    const menuAbout = document.getElementById('menuAbout');
+
+    if (menuHome) {
+      menuHome.addEventListener('click', function() {
+        closeSidebar();
+        if (document.getElementById('modelPage').classList.contains('active')) {
+          closeModelPage();
+        }
+      });
+    }
+    if (menuUpload) {
+      menuUpload.addEventListener('click', function() {
+        closeSidebar();
+        const subject = encodeURIComponent('Новая 3D Модель для MiFab');
+        const body = encodeURIComponent(
+          'Привет, VALHAISTO!\n\n' +
+          'Я хочу опубликовать свою 3D модель на MiFab.\n' +
+          'Прикрепляю файл (.gltf/.fbx/.obj) и текстуры к этому письму.\n' +
+          'Мой никнейм на сайте: ' + currentNick + '\n\n' +
+          'Спасибо!'
+        );
+        window.location.href = 'mailto:nazimkuvandykov14@gmail.com?subject=' + subject + '&body=' + body;
+      });
+    }
+    if (menuProfile) {
+      menuProfile.addEventListener('click', function() {
+        closeSidebar();
+        updateTimer();
+        updateProfileDisplay();
+        if (profileModal) profileModal.classList.add('active');
+      });
+    }
+    if (menuAbout) {
+      menuAbout.addEventListener('click', function() {
+        closeSidebar();
+        const aboutModal = document.getElementById('aboutModal');
+        if (aboutModal) aboutModal.classList.add('active');
+      });
+    }
+
+    // ========================================================================
+    // МОДАЛКА "О ПРОЕКТЕ"
+    // ========================================================================
+    const aboutModal = document.getElementById('aboutModal');
+    const aboutCloseBtn = document.getElementById('aboutCloseBtn');
+    if (aboutCloseBtn) aboutCloseBtn.addEventListener('click', function() {
+      if (aboutModal) aboutModal.classList.remove('active');
+    });
+    if (aboutModal) {
+      aboutModal.addEventListener('click', function(e) {
+        if (e.target === this) aboutModal.classList.remove('active');
+      });
+    }
+
+    // ========================================================================
+    // УВЕДОМЛЕНИЯ
+    // ========================================================================
+    const bellBtn = document.getElementById('bellBtn');
+
+    function requestNotifications() {
+      if (!('Notification' in window)) {
+        showModal('Уведомления', 'Ваш браузер не поддерживает уведомления');
+        return;
+      }
+      if (Notification.permission === 'granted') {
+        showModal('Уведомления', 'Уведомления уже разрешены!');
+        return;
+      }
+      if (Notification.permission === 'denied') {
+        showModal('Уведомления', 'Уведомления заблокированы.');
+        return;
+      }
+      Notification.requestPermission().then(function(permission) {
+        if (permission === 'granted') {
+          showModal('Уведомления', 'Уведомления включены!');
+          try {
+            const n = new Notification('MiFab', { body: 'Добро пожаловать в MiFab!' });
+            setTimeout(function() { n.close(); }, 4000);
+          } catch (e) {}
+        } else {
+          showModal('Уведомления', 'Уведомления отклонены.');
+        }
+      });
+    }
+
+    setTimeout(function() {
+      if ('Notification' in window && Notification.permission === 'default') {
+        requestNotifications();
+      }
+    }, 2000);
+
+    if (bellBtn) {
+      bellBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        requestNotifications();
+        const dot = this.querySelector('.bell-dot');
+        if (dot) {
+          dot.style.background = '#b0b0bc';
+          setTimeout(function() { dot.style.background = '#f0a8b9'; }, 400);
+        }
+      });
+    }
+
+    // ========================================================================
+    // ЛОГОТИП (fallback)
+    // ========================================================================
+    const logoImg = document.getElementById('logoImg');
+    if (logoImg) {
+      logoImg.addEventListener('error', function() {
+        this.style.display = 'none';
+        const fallback = document.createElement('span');
+        fallback.textContent = 'MiFab';
+        fallback.style.fontWeight = '700';
+        fallback.style.fontSize = '1.4rem';
+        fallback.style.color = '#2a2b30';
+        if (this.parentNode) this.parentNode.appendChild(fallback);
+      });
+    }
+
+    // ========================================================================
+    // ЗАПУСК
+    // ========================================================================
+    renderCards(modelsData);
+
+    console.log('✅ MiFab — финальная версия без THREE.js, только GLTFLoader для скачивания!');
+    console.log('📦 Загружено моделей: ' + modelsData.length);
+  })();
+</script>
+</body>
+</html>
